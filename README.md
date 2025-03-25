@@ -6,7 +6,7 @@ This guide provides step-by-step instructions to set up and run a simple Spark a
 
 For detailed documentation, refer to the [official guide](https://www.kubeflow.org/docs/components/spark-operator/getting-started/).
 
-### 1. Download Spark
+### 1. [OPTIONAL] Download Spark
 
 Download and extract the latest Spark binary compatible with Hadoop:
 
@@ -39,7 +39,9 @@ Install the Spark Operator using Helm:
 ```bash
 helm repo add spark-operator https://kubeflow.github.io/spark-operator
 helm repo update
-helm install spark-operator spark-operator/spark-operator     --namespace spark-operator --create-namespace --wait
+helm install spark-operator spark-operator/spark-operator \
+    --namespace spark-operator \
+    --create-namespace
 ```
 
 ### 5. Configure Permissions

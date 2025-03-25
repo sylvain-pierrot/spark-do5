@@ -8,3 +8,16 @@ spec:
   mode: cluster
   image: spark-py:simple-app
   mainApplicationFile: local:///opt/spark/python/SimpleApp.py
+  driver:
+    cores: 1
+    coreLimit: "1200m"
+    memory: "512m"
+    labels:
+      version: 3.5.5
+  executor:
+    cores: 1
+    instances: 2
+    memory: "512m"
+    labels:
+      version: 3.5.5
+  sparkVersion: "3.5.5"

@@ -1,0 +1,10 @@
+apiVersion: sparkoperator.k8s.io/v1beta2
+kind: SparkApplication
+metadata:
+  name: spark-simple-app
+  namespace: default
+spec:
+  type: Python
+  mode: cluster
+  image: spark-py:simple-app
+  mainApplicationFile: local:///opt/spark/python/SimpleApp.py

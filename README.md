@@ -32,16 +32,24 @@ kind create cluster
 kind load docker-image spark-py:simple-app
 ```
 
-### 4. Deploy the Spark Operator
+### 4. Deploy the Spark Operator & MinIO Operator
 
-Install the Spark Operator using Helm:
+Install using Helm:
 
 ```bash
+# Spark Operator
 helm repo add spark-operator https://kubeflow.github.io/spark-operator
 helm repo update
 helm install spark-operator spark-operator/spark-operator \
     --namespace spark-operator \
     --create-namespace
+
+# MinIO Operator
+helm repo add minio-operator https://operator.min.io
+helm install \
+  --namespace minio-operator \
+  --create-namespace \
+  operator minio-operator/operator
 ```
 
 ### 5. Configure Permissions
@@ -52,12 +60,18 @@ Create a `ClusterRoleBinding` to allow Spark jobs to run:
 kubectl create clusterrolebinding spark-role --clusterrole=edit --serviceaccount=default:default --namespace=default
 ```
 
-### 6. Deploy and Run the Spark Application
+### 6. Create MinIO
+
+```bash
+kubectl apply -f kubernetes/tenantMinio.yaml
+```
+
+### 7. Deploy and Run the Spark Application
 
 Apply the Spark application manifest:
 
 ```bash
-kubectl apply -f simple-app/sparkApp.yaml
+kubectl apply -f kubernetes/sparkApplication.yaml
 ```
 
 ## Outcome

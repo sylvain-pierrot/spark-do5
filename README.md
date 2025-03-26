@@ -1,10 +1,15 @@
 # Spark on Kubernetes with Spark Operator
 
-This guide provides step-by-step instructions to set up and run a simple Spark application on a Kubernetes cluster using the Spark Operator.
+This guide provides step-by-step instructions to set up and run Spark applications on a Kubernetes cluster using the Spark Operator. It showcases two distinct examples: reading data from MinIO and querying Neo4j.
+
+## SampleApp & SimpleApp
+
+- **SimpleApp** is a Spark application that retrieves a file from MinIO and displays its content using PySpark.
+- **SampleApp** is a Spark application that connects to a Neo4j instance using the Neo4j Spark Connector and runs a Cypher query (`CALL db.schema.visualization`) to retrieve schema information.
 
 ## Getting Started
 
-For detailed documentation, refer to the [official guide](https://www.kubeflow.org/docs/components/spark-operator/getting-started/).
+For detailed documentation, refer to the [official Spark Operator guide](https://www.kubeflow.org/docs/components/spark-operator/getting-started/).
 
 ### 1. [OPTIONAL] Download Spark
 
@@ -15,15 +20,7 @@ wget https://www.apache.org/dyn/closer.lua/spark/spark-3.5.5/spark-3.5.5-bin-had
 tar -xvzf spark-3.5.5-bin-hadoop3.tgz
 ```
 
-### 2. Build the SimpleApp Docker Image
-
-Navigate to the root project directory and build the Docker image:
-
-```bash
-docker build -t spark-py:simple-app simple-app/
-```
-
-### 3. Create a Kubernetes Cluster with Kind
+### 2. Create a Kubernetes Cluster with Kind
 
 Set up a local Kubernetes cluster using Kind:
 
@@ -32,7 +29,7 @@ kind create cluster
 kind load docker-image spark-py:simple-app
 ```
 
-### 4. Deploy the Spark Operator & MinIO Operator
+### 3. Deploy the Spark, MinIO, and Neo4j
 
 Install using Helm:
 
@@ -50,31 +47,46 @@ helm install \
   --namespace minio-operator \
   --create-namespace \
   operator minio-operator/operator
+
+# Neo4j
+helm repo add neo4j https://helm.neo4j.com/neo4j
+helm install neo4j neo4j/neo4j \
+    --namespace neo4j \
+    --create-namespace \
+    --set neo4j.name=neo4j-instance \
+    --set volumes.data.mode=defaultStorageClass
+kubectl apply -f kubernetes/tenantMinio.yaml
 ```
 
-### 5. Configure Permissions
+### 4. Configure Permissions
 
 Create a `ClusterRoleBinding` to allow Spark jobs to run:
 
 ```bash
-kubectl create clusterrolebinding spark-role --clusterrole=edit --serviceaccount=default:default --namespace=default
+kubectl create clusterrolebinding spark-role \
+  --clusterrole=edit \
+  --serviceaccount=default:default \
+  --namespace=default
 ```
 
-### 6. Create MinIO
+### 5. Run the Spark Applications
+
+- Run SimpleApp (MinIO):
 
 ```bash
-kubectl apply -f kubernetes/tenantMinio.yaml
+kubectl apply -f kubernetes/simple-app/sparkApplication-v2.yaml
 ```
 
-### 7. Deploy and Run the Spark Application
-
-Apply the Spark application manifest:
+- Run SampleApp (Neo4j):
 
 ```bash
-kubectl apply -f kubernetes/sparkApplication.yaml
+kubectl apply -f kubernetes/sample-app/sparkApplication.yaml
 ```
 
 ## Outcome
 
-![outcome](./assets/outcome.png)
+### Spark Reading from MinIO
+![Spark MinIO](./assets/spark-minio.png)
 
+### Spark Querying Neo4j
+![Neo4j Connector](./assets/spark-neo4j-connector.png)

@@ -69,7 +69,14 @@ kubectl create clusterrolebinding spark-role \
   --namespace=default
 ```
 
-### 5. Run the Spark Applications
+### 5. Uploaded Files in MinIO
+
+Upload:
+- `SampleApp.py` (from `sample-app/`) to the `python` bucket via the MinIO web interface.
+- `SimpleApp.py` (from `simple-app/`) to the `python` bucket via the MinIO web interface.
+- `README.md` to the `documents` bucket via the MinIO web interface.
+
+### 6. Run the Spark Applications
 
 - Run SimpleApp (MinIO):
 

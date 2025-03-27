@@ -6,14 +6,13 @@ metadata:
 spec:
   type: Python
   mode: cluster
-  image: apache/spark:3.5.5
-  mainApplicationFile: local:///opt/spark/scripts/BucketMonitorApp-v2.py
+  image: spark-py:base-tls
+  mainApplicationFile: https://minio.minio-tenant.svc.cluster.local/python/BucketMonitorApp-v2.py
   deps:
     jars:
     - https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/3.3.4/hadoop-aws-3.3.4.jar
     - https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk-bundle/1.11.1026/aws-java-sdk-bundle-1.11.1026.jar
   driver:
-    javaOptions: "-Dcom.amazonaws.sdk.disableCertChecking=true"
     env:
     - name: S3_ENDPOINT
       value: https://minio.minio-tenant.svc.cluster.local
@@ -23,26 +22,12 @@ spec:
       value: hvOtahI6KoaojcYB6Qe5IxVC1T2w8x3VvzYre0Rx
     - name: S3_BUCKET
       value: documents
-    volumeMounts:
-    - name: app-volume
-      mountPath: /opt/spark/scripts
-    initContainers:
-    - name: fetch-script
-      image: curlimages/curl
-      command:
-      - sh
-      - -c
-      - 'curl -k -o /opt/spark/scripts/BucketMonitorApp-v2.py https://minio.minio-tenant.svc.cluster.local/python/BucketMonitorApp-v2.py'
-      volumeMounts:
-      - name: app-volume
-        mountPath: /opt/spark/scripts
     # cores: 1
     # coreLimit: "1200m"
     # memory: "512m"
     labels:
       version: 3.5.5
   executor:
-    javaOptions: "-Dcom.amazonaws.sdk.disableCertChecking=true"
     env:
     - name: S3_ENDPOINT
       value: https://minio.minio-tenant.svc.cluster.local
@@ -52,15 +37,9 @@ spec:
       value: hvOtahI6KoaojcYB6Qe5IxVC1T2w8x3VvzYre0Rx
     - name: S3_BUCKET
       value: documents
-    volumeMounts:
-    - name: app-volume
-      mountPath: /opt/spark/scripts
     # cores: 1
     instances: 2
     # memory: "512m"
     labels:
       version: 3.5.5
-  volumes:
-  - name: app-volume
-    emptyDir: {}
   sparkVersion: "3.5.5"

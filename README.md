@@ -105,6 +105,8 @@ kubectl apply -f kubernetes/sparkApplications/data-analysis.yaml
 - Run BucketMonitorApp:
 
 ```bash
+docker build -t spark-py:base-tls apps/ -f apps/with-minio-tls.Dockerfile
+kind load docker-image spark-py:base-tls
 kubectl apply -f kubernetes/sparkApplications/bucket-monitor-v2.yaml
 ```
 

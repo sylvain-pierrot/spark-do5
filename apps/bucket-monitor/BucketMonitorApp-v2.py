@@ -37,7 +37,7 @@ df = (
 query = (
     df.writeStream.outputMode("append")
     .format("console")
-    .option("truncate", False)
+    .option("truncate", True)
     .start()
 )
 

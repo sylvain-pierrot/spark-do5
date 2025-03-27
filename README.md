@@ -8,6 +8,7 @@ This guide provides step-by-step instructions to set up and run Spark applicatio
 - **SampleApp** is a Spark application that connects to a Neo4j instance using the Neo4j Spark Connector and runs a Cypher query (`CALL db.schema.visualization`) to retrieve schema information.
 - **DataAnalysisApp** is a Spark application that loads the `wikipedia.dat` file from MinIO, extracts fields (like categories), transforms the raw data into a DataFrame, and counts the top 50 most frequent categories.
 - **BucketMonitorApp** is a Spark-compatible Python application that continuously monitors a MinIO bucket for changes (file additions or deletions). It compares the current state of the bucket with the previous one and logs detailed messages when differences are detected — including lists of added or removed files.
+- **KafkaConsumerApp** is a Spark application that consums a topic kafka.
 
 ## Getting Started
 
@@ -58,6 +59,15 @@ helm install neo4j neo4j/neo4j \
     --set neo4j.name=neo4j-instance \
     --set volumes.data.mode=defaultStorageClass
 kubectl apply -f kubernetes/tenantMinio.yaml
+
+# Kafka
+helm repo add strimzi https://strimzi.io/charts/
+helm -n kafka upgrade --install my-strimzi-kafka-operator strimzi/strimzi-kafka-operator \
+  --version 0.45.0 \
+  --set fullReconciliationIntervalMs=3000 \
+  --set watchAnyNamespace=true \
+  --create-namespace
+kubectl apply -f kubernetes/kafka-with-dual-role-nodes.yaml
 ```
 
 ### 4. Configure Permissions
@@ -79,6 +89,8 @@ Create also a bucket named `documents` on MinIO, then upload:
 - `SampleApp.py` (from **apps/sample-app/**) to the `python` bucket via the MinIO web interface.
 - `SimpleApp.py` (from **apps/simple-app/**) to the `python` bucket via the MinIO web interface.
 - `DataAnalysisApp.py` (from **apps/data-analysis/**) to the `python` bucket via the MinIO web interface.
+- `BucketMonitorApp-v2.py` (from **apps/data-analysis/**) to the `python` bucket via the MinIO web interface.
+- `KafkaConsumerApp.py` (from **apps/data-analysis/**) to the `python` bucket via the MinIO web interface.
 - `README.md` to the `documents` bucket via the MinIO web interface.
 - `wikipedia.dat` to the `documents` bucket via the MinIO web interface.
 
@@ -110,6 +122,14 @@ kind load docker-image spark-py:base-tls
 kubectl apply -f kubernetes/sparkApplications/bucket-monitor-v2.yaml
 ```
 
+- Run BucketMonitorApp:
+
+```bash
+docker build -t spark-py:base-tls apps/ -f apps/with-minio-tls.Dockerfile
+kind load docker-image spark-py:base-tls
+kubectl apply -f kubernetes/sparkApplications/kafka-consumer.yaml
+```
+
 ## Outcome
 
 ### Spark Reading from MinIO
@@ -128,3 +148,6 @@ kubectl apply -f kubernetes/sparkApplications/bucket-monitor-v2.yaml
 
 - **Version 2:**
 ![Spark Bucket Monitor](./assets/bucket-monitor-v2.png)
+
+### Spark Kafka Consummer
+![Spark Kafka](./assets/kafka-consumer.png)

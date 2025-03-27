@@ -12,8 +12,8 @@ endpoint_url = os.environ["S3_ENDPOINT"]
 access_key = os.environ["S3_ACCESS_KEY"]
 secret_key = os.environ["S3_SECRET_KEY"]
 bucket_name = os.environ["S3_BUCKET"]
-prefix = os.environ.get("S3_PREFIX", "") 
-interval = int(os.environ.get("MONITOR_INTERVAL", "1")) 
+prefix = os.environ.get("S3_PREFIX", "")
+interval = int(os.environ.get("MONITOR_INTERVAL", "1"))
 
 spark = SparkSession.builder.appName("BucketMonitorApp").getOrCreate()
 
@@ -22,14 +22,18 @@ s3 = boto3.client(
     endpoint_url=endpoint_url,
     aws_access_key_id=access_key,
     aws_secret_access_key=secret_key,
-    verify=False
+    verify=False,
 )
+
 
 def list_files():
     response = s3.list_objects_v2(Bucket=bucket_name, Prefix=prefix)
     return sorted([obj["Key"] for obj in response.get("Contents", [])])
 
-print(f"[{datetime.now()}] 📦 Monitoring bucket '{bucket_name}' (prefix: '{prefix}') every {interval}s...\n")
+
+print(
+    f"[{datetime.now()}] 📦 Monitoring bucket '{bucket_name}' (prefix: '{prefix}') every {interval}s...\n"
+)
 
 previous_files = list_files()
 no_change_reported = False

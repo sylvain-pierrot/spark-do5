@@ -13,11 +13,6 @@ spark = (
     .getOrCreate()
 )
 
-(
-    spark.read.format("org.neo4j.spark.DataSource")
-    .option("labels", "User")
-    .load()
-    .show()
-)
+(spark.read.format("org.neo4j.spark.DataSource").option("labels", "User").load().show())
 
 spark.stop()

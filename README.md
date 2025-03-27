@@ -105,9 +105,7 @@ kubectl apply -f kubernetes/sparkApplications/data-analysis.yaml
 - Run BucketMonitorApp:
 
 ```bash
-docker build -t spark-py:base-boto3 apps/ -f apps/apache-spark-with-boto3.Dockerfile
-kind load docker-image spark-py:base-boto3
-kubectl apply -f kubernetes/sparkApplications/bucket-monitor.yaml
+kubectl apply -f kubernetes/sparkApplications/bucket-monitor-v2.yaml
 ```
 
 ## Outcome

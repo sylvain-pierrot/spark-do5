@@ -1,12 +1,13 @@
 # Spark on Kubernetes with Spark Operator
 
-This guide provides step-by-step instructions to set up and run Spark applications on a Kubernetes cluster using the Spark Operator. It showcases two distinct examples: reading data from MinIO and querying Neo4j.
+This guide provides step-by-step instructions to set up and run Spark applications on a Kubernetes cluster using the Spark Operator. 
 
 ## Applications
 
 - **SimpleApp** is a Spark application that retrieves a file from MinIO and displays its content using PySpark.
 - **SampleApp** is a Spark application that connects to a Neo4j instance using the Neo4j Spark Connector and runs a Cypher query (`CALL db.schema.visualization`) to retrieve schema information.
 - **DataAnalysisApp** is a Spark application that loads the `wikipedia.dat` file from MinIO, extracts fields (like categories), transforms the raw data into a DataFrame, and counts the top 50 most frequent categories.
+- **BucketMonitorApp** is a Spark-compatible Python application that continuously monitors a MinIO bucket for changes (file additions or deletions). It compares the current state of the bucket with the previous one and logs detailed messages when differences are detected — including lists of added or removed files.
 
 ## Getting Started
 
@@ -61,7 +62,7 @@ kubectl apply -f kubernetes/tenantMinio.yaml
 
 ### 4. Configure Permissions
 
-Create a `ClusterRoleBinding` to allow Spark jobs to run:
+- Create a `ClusterRoleBinding` to allow Spark jobs to run:
 
 ```bash
 kubectl create clusterrolebinding spark-role \
@@ -70,32 +71,43 @@ kubectl create clusterrolebinding spark-role \
   --namespace=default
 ```
 
+- Create a bucket named `python` on MinIO and set access as **public**.
+
 ### 5. Uploaded Files in MinIO
 
-Upload:
+Create also a bucket named `documents` on MinIO, then upload:
 - `SampleApp.py` (from **apps/sample-app/**) to the `python` bucket via the MinIO web interface.
 - `SimpleApp.py` (from **apps/simple-app/**) to the `python` bucket via the MinIO web interface.
 - `DataAnalysisApp.py` (from **apps/data-analysis/**) to the `python` bucket via the MinIO web interface.
 - `README.md` to the `documents` bucket via the MinIO web interface.
+- `wikipedia.dat` to the `documents` bucket via the MinIO web interface.
 
 ### 6. Run the Spark Applications
 
 - Run SimpleApp (MinIO):
 
 ```bash
-kubectl apply -f kubernetes/simple-app/sparkApplication-v2.yaml
+kubectl apply -f kubernetes/sparkApplications/simple-app-v2.yaml
 ```
 
 - Run SampleApp (Neo4j):
 
 ```bash
-kubectl apply -f kubernetes/sample-app/sparkApplication.yaml
+kubectl apply -f kubernetes/sparkApplications/sample-app.yaml
 ```
 
 - Run DataAnalysisApp (Wikipedia):
 
 ```bash
-kubectl apply -f kubernetes/data-analysis/sparkApplication.yaml
+kubectl apply -f kubernetes/sparkApplications/data-analysis.yaml
+```
+
+- Run BucketMonitorApp:
+
+```bash
+docker build -t spark-py:base-boto3 apps/ -f apps/apache-spark-with-boto3.Dockerfile
+kind load docker-image spark-py:base-boto3
+kubectl apply -f kubernetes/sparkApplications/bucket-monitor.yaml
 ```
 
 ## Outcome
@@ -108,3 +120,6 @@ kubectl apply -f kubernetes/data-analysis/sparkApplication.yaml
 
 ### Spark Top 50 Wikipedia Categories
 ![Spark MinIO](./assets/spark-minio.png)
+
+### Spark Bucket Monitor
+![Spark Bucket Monitor](./assets/bucket-monitor.png)

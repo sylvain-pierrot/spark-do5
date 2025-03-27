@@ -27,9 +27,4 @@ df = spark.read.text(s3_uri)
 
 df.show()
 
-# numAs = logData.filter(logData.value.contains('a')).count()
-# numBs = logData.filter(logData.value.contains('b')).count()
-
-# print("Lines with a: %i, lines with b: %i" % (numAs, numBs))
-
 spark.stop()

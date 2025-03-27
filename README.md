@@ -120,4 +120,9 @@ kubectl apply -f kubernetes/sparkApplications/bucket-monitor-v2.yaml
 ![Spark MinIO](./assets/spark-minio.png)
 
 ### Spark Bucket Monitor
-![Spark Bucket Monitor](./assets/bucket-monitor.png)
+
+- **Version 1:**
+![Spark Bucket Monitor](./assets/bucket-monitor-v1.png)
+
+- **Version 2:**
+![Spark Bucket Monitor](./assets/bucket-monitor-v2.png)

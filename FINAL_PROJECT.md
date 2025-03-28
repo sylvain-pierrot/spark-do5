@@ -68,3 +68,45 @@ ORDER BY Count DESC;
 ```
 
 ![question-5](./assets/final/question-5.png)
+
+### 6. What types of transactions do Clients perform with First Party Fraudsters?
+
+```cypher
+MATCH (:Client:FirstPartyFraudster)-[]-(txn:Transaction)-[]-(c:Client)
+WHERE NOT c:FirstPartyFraudster
+UNWIND labels(txn) AS transactionType
+RETURN transactionType, count(*) AS frequency
+ORDER BY frequency DESC
+```
+
+### 7. How many clusters of Fraud Rings have more than 9 client nodes?
+
+```cypher
+CALL gds.wcc.stream('wcc')
+YIELD componentId, nodeId
+WITH componentId, collect(gds.util.asNode(nodeId)) AS nodes
+WITH componentId, nodes, size(nodes) AS clusterSize
+WHERE clusterSize > 9
+UNWIND nodes AS client
+MATCH (client)-[:SHARED_IDENTIFIERS]-(others:Client)
+WHERE others IN nodes
+RETURN client, others;
+```
+
+![question-7](./assets/final/question-7.png)
+
+### 8. How many clusters of Fraud Rings have more than 10 client nodes?
+
+```cypher
+CALL gds.wcc.stream('wcc')
+YIELD componentId, nodeId
+WITH componentId, collect(gds.util.asNode(nodeId)) AS nodes
+WITH componentId, nodes, size(nodes) AS clusterSize
+WHERE clusterSize > 10
+UNWIND nodes AS client
+MATCH (client)-[:SHARED_IDENTIFIERS]-(others:Client)
+WHERE others IN nodes
+RETURN client, others;
+```
+
+![question-8](./assets/final/question-8.png)

@@ -79,6 +79,8 @@ RETURN transactionType, count(*) AS frequency
 ORDER BY frequency DESC
 ```
 
+![spark-query](./assets/final/spark-query.png)
+
 ### 7. How many clusters of Fraud Rings have more than 9 client nodes?
 
 ```cypher

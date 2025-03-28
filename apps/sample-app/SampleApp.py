@@ -1,9 +1,10 @@
 from pyspark.sql import SparkSession
+import os
 
-url = "neo4j://neo4j.neo4j.svc.cluster.local:7687"
-username = "neo4j"
-password = "gNi2hv5rzQtq1r"
-dbname = "neo4j"
+url = os.getenv("NEO4J_URL", "neo4j://neo4j.neo4j.svc.cluster.local:7687")
+username = os.getenv("NEO4J_USERNAME", "neo4j")
+password = os.getenv("NEO4J_PASSWORD", "gNi2hv5rzQtq1r")
+dbname = os.getenv("NEO4J_DATABASE", "neo4j")
 
 spark = (
     SparkSession.builder.config("neo4j.url", url)

@@ -12,6 +12,15 @@ spec:
     jars:
     - https://github.com/neo4j/neo4j-spark-connector/releases/download/5.3.5/neo4j-connector-apache-spark_2.12-5.3.5_for_spark_3.jar
   driver:
+    env:
+    - name: NEO4J_URL
+      value: neo4j://neo4j.neo4j.svc.cluster.local:7687
+    - name: NEO4J_USERNAME
+      value: neo4j
+    - name: NEO4J_PASSWORD
+      value: gNi2hv5rzQtq1r
+    - name: NEO4J_DATABASE
+      value: neo4j
     volumeMounts:
     - name: app-volume
       mountPath: /opt/spark/scripts
@@ -19,18 +28,27 @@ spec:
     - name: fetch-script
       image: curlimages/curl
       command:
-        - sh
-        - -c
-        - 'curl -k -o /opt/spark/scripts/SampleApp.py https://minio.minio-tenant.svc.cluster.local/python/SampleApp.py'
+      - sh
+      - -c
+      - 'curl -k -o /opt/spark/scripts/SampleApp.py https://minio.minio-tenant.svc.cluster.local/python/SampleApp.py'
       volumeMounts:
-        - name: app-volume
-          mountPath: /opt/spark/scripts
+      - name: app-volume
+        mountPath: /opt/spark/scripts
     # cores: 1
     # coreLimit: "1200m"
     # memory: "512m"
     labels:
       version: 3.5.5
   executor:
+    env:
+    - name: NEO4J_URL
+      value: neo4j://neo4j.neo4j.svc.cluster.local:7687
+    - name: NEO4J_USERNAME
+      value: neo4j
+    - name: NEO4J_PASSWORD
+      value: gNi2hv5rzQtq1r
+    - name: NEO4J_DATABASE
+      value: neo4j
     volumeMounts:
     - name: app-volume
       mountPath: /opt/spark/scripts
